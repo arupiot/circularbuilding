@@ -1,0 +1,5 @@
+*.pyc
+BLE/
+Event_Logs/
+ExceptionLog.txt
+Packet_Logs/
