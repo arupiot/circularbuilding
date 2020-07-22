@@ -546,10 +546,10 @@ class BGLib(object):
         return struct.pack('<4BH', 0, 2, 7, 4, key)
     def wifi_cmd_flash_ps_erase(self, key):
         return struct.pack('<4BH', 0, 2, 7, 5, key)
-    def wifi_cmd_i2c_start_read(self, endpoint, slave_address, length):
-        return struct.pack('<4BBHB', 0, 4, 8, 0, endpoint, slave_address, length)
-    def wifi_cmd_i2c_start_write(self, endpoint, slave_address):
-        return struct.pack('<4BBH', 0, 3, 8, 1, endpoint, slave_address)
+    def wifi_cmd_i2c_start_read(self, endpoint, subordinate_address, length):
+        return struct.pack('<4BBHB', 0, 4, 8, 0, endpoint, subordinate_address, length)
+    def wifi_cmd_i2c_start_write(self, endpoint, subordinate_address):
+        return struct.pack('<4BBH', 0, 3, 8, 1, endpoint, subordinate_address)
     def wifi_cmd_i2c_stop(self, endpoint):
         return struct.pack('<4BB', 0, 1, 8, 2, endpoint)
     def wifi_cmd_https_enable(self, https, dhcps, dnss):
