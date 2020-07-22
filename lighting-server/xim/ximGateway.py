@@ -29,7 +29,7 @@ V1.0.5
 - Changed rssiThresholds elements from 6 to 5
 - Added fixture information to the GetInfo response
 - Changed demoAirQuality to 500 +/10% random
-- Added importing of ble_xim.py from /DALI Master
+- Added importing of ble_xim.py from /DALI Main
 - Added error checking on intensityHistogram before updating powerHistogram
 
 V1.0.6
@@ -51,7 +51,7 @@ V1.0.8
 - Incorporates the ble_xim V1.17 updates
 
 V1.0.9
-- Added DISCOVER_DURATION to give the BLE master time to discover new devices
+- Added DISCOVER_DURATION to give the BLE main time to discover new devices
 - Added PERSISTENT_CONNECTION option (currently disabled)
 - Incorporates the ble_xim V1.18 updates
 - Added a check for ble_xim_IsDeviceConnecting while waiting for the connection

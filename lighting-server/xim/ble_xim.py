@@ -2487,12 +2487,12 @@ def ProcessFailedConnection(device):
 
 # Initalizes the connection parameters and stores to the file bleConnectParamsFileName
 def InitializeConnectionParameters():
-    global DISCONNECT_TIMEOUT, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSlaveLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId
+    global DISCONNECT_TIMEOUT, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSubordinateLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId
 
     bleMinInterval = MIN_INTERVAL
     bleMaxInterval = MAX_INTERVAL
     bleConnTimeout = CONN_TIMEOUT
-    bleSlaveLatency = SLAVE_LATENCY
+    bleSubordinateLatency = SLAVE_LATENCY
     bgRxGain = RX_GAIN
     bleAdvertisingIntervalMin = ADVERTISING_INTERVAL_MIN
     bleAdvertisingIntervalMax = ADVERTISING_INTERVAL_MAX
@@ -2515,7 +2515,7 @@ def InitializeConnectionParameters():
                 textLineList = textLines[2].split(':')
                 bleConnTimeout = GetTimeoutValue(textLineList[1])
                 textLineList = textLines[3].split(':')
-                bleSlaveLatency = int(textLineList[1])
+                bleSubordinateLatency = int(textLineList[1])
 
                 if(len(textLines) > 4):
                     textLineList = textLines[4].split(':')
@@ -2556,30 +2556,30 @@ def InitializeConnectionParameters():
                 else:
                     fileNeedsUpdate = True
 
-                logHandler.printLog("Min Interval: {0}, Max Interval: {1}, Connection Timeout: {2}, Slave Latency: {3}, Rx Gain: {4}".format(GetIntervalMs(bleMinInterval), GetIntervalMs(bleMaxInterval), GetTimeoutMs(bleConnTimeout), bleSlaveLatency, bgRxGain), True)
+                logHandler.printLog("Min Interval: {0}, Max Interval: {1}, Connection Timeout: {2}, Subordinate Latency: {3}, Rx Gain: {4}".format(GetIntervalMs(bleMinInterval), GetIntervalMs(bleMaxInterval), GetTimeoutMs(bleConnTimeout), bleSubordinateLatency, bgRxGain), True)
         except:
             fileNeedsUpdate = True
 
 
     if(fileNeedsUpdate):
         logHandler.printLog("Error while reading data from {0}. Restoring values.".format(bleConnectParamsFileName), True)
-        SetConnectionParameters(bleMinInterval, bleMaxInterval, bleConnTimeout, bleSlaveLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId)
+        SetConnectionParameters(bleMinInterval, bleMaxInterval, bleConnTimeout, bleSubordinateLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId)
 
     DISCONNECT_TIMEOUT = bleConnTimeout * 10.0 / 1000.0 + 0.010
 
 
 # Sets the connection parameters using the real world values (milliseconds for times)
-def SetConnectionParametersRealValues(minIntervalMs, maxIntervalMs, connTimeoutMs, slaveLatency):
-    SetConnectionParameters(GetIntervalValue(minIntervalMs), GetIntervalValue(maxIntervalMs), GetTimeoutValue(connTimeoutMs), slaveLatency)
+def SetConnectionParametersRealValues(minIntervalMs, maxIntervalMs, connTimeoutMs, subordinateLatency):
+    SetConnectionParameters(GetIntervalValue(minIntervalMs), GetIntervalValue(maxIntervalMs), GetTimeoutValue(connTimeoutMs), subordinateLatency)
 
 # Sets the connection parameters using the BlueGiga format)
-def SetConnectionParameters(minInterval, maxInterval, connTimeout, slaveLatency, rxGain = None, advertisingIntervalMin = None, advertisingIntervalMax = None, advertisingWindow = None, localDeviceId = None):
-    global DISCONNECT_TIMEOUT, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSlaveLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId
+def SetConnectionParameters(minInterval, maxInterval, connTimeout, subordinateLatency, rxGain = None, advertisingIntervalMin = None, advertisingIntervalMax = None, advertisingWindow = None, localDeviceId = None):
+    global DISCONNECT_TIMEOUT, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSubordinateLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, bleLocalDeviceId
 
     bleMinInterval = minInterval
     bleMaxInterval = maxInterval
     bleConnTimeout = connTimeout
-    bleSlaveLatency = slaveLatency
+    bleSubordinateLatency = subordinateLatency
 
 
     if(rxGain != None):
@@ -2597,7 +2597,7 @@ def SetConnectionParameters(minInterval, maxInterval, connTimeout, slaveLatency,
         f.write("min_interval:{0}\n".format(GetIntervalMs(minInterval)))
         f.write("max_interval:{0}\n".format(GetIntervalMs(maxInterval)))
         f.write("timeout:{0}\n".format(GetTimeoutMs(connTimeout)))
-        f.write("latency:{0}\n".format(slaveLatency))
+        f.write("latency:{0}\n".format(subordinateLatency))
         f.write("rx_gain:{0}\n".format(bgRxGain))
 
         f.write("adv_interval_min:{0}\n".format(bleAdvertisingIntervalMin))
@@ -2608,7 +2608,7 @@ def SetConnectionParameters(minInterval, maxInterval, connTimeout, slaveLatency,
 
 # Returns the connection parameters using the real world values (milliseconds for times)
 def GetConnectionParametersRealValues():
-    return GetIntervalMs(bleMinInterval), GetIntervalMs(bleMaxInterval), GetTimeoutMs(bleConnTimeout), bleSlaveLatency
+    return GetIntervalMs(bleMinInterval), GetIntervalMs(bleMaxInterval), GetTimeoutMs(bleConnTimeout), bleSubordinateLatency
 
 # Converts BlueGiga scaled value to milliseconds
 def GetIntervalMs(value):
@@ -3813,7 +3813,7 @@ def SetLocalDeviceId(deviceId):
 
     if(deviceId <= 32767):
         bleLocalDeviceId = deviceId
-        SetConnectionParameters(bleMinInterval, bleMaxInterval, bleConnTimeout, bleSlaveLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, deviceId)
+        SetConnectionParameters(bleMinInterval, bleMaxInterval, bleConnTimeout, bleSubordinateLatency, bgRxGain, bleAdvertisingIntervalMin, bleAdvertisingIntervalMax, bleAdvertisingWindow, deviceId)
 
 
 """
@@ -3843,8 +3843,8 @@ with values:
         when it starts changing the intensity.
         The XIM's resolution is 10 millisecond steps
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -3865,8 +3865,8 @@ Advertises a light control packet that stops fading to destination device ID (4-
         when it starts changing the intensity.
         The XIM's resolution is 10 millisecond steps
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -3886,8 +3886,8 @@ Advertises a light control packet that stops fading to destination device ID (4-
         when it starts changing the intensity.
         The XIM's resolution is 10 millisecond steps
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -3984,8 +3984,8 @@ with values:
         when it starts changing the intensity.
         The XIM's resolution is 10 millisecond steps
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -4348,7 +4348,7 @@ def Connect(addressValue, timeout = -1):
                     device.connectionAttemptTime = time.time()
                     logHandler.printLog("\n{0}: Connect to {1}".format(time.time(), device.address))
                     if(device.deviceType in [DEVICE_TYPE_XIM, DEVICE_TYPE_XSENSOR]):
-                        ble.send_command(ser, ble.ble_cmd_gap_connect_direct(device.address, device.address_type, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSlaveLatency))
+                        ble.send_command(ser, ble.ble_cmd_gap_connect_direct(device.address, device.address_type, bleMinInterval, bleMaxInterval, bleConnTimeout, bleSubordinateLatency))
                         SetBusyFlag()
                         connectionSuccess = True
 
@@ -4555,8 +4555,8 @@ Writes to the light level control characteristic of the given BLE address to set
     'fade_time': Time to fade from the current intensity to the new intensity,
         in milliseconds (0 - 60000)
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -4583,8 +4583,8 @@ Writes to the light level control characteristic of the given BLE address to sto
     a fade in progress.
     address: 6-byte BLE address list
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
@@ -4610,8 +4610,8 @@ Writes to the light level control characteristic of the given BLE address to sto
     a fade in progress.
     address: 6-byte BLE address list
     'override_time': Duration (in seconds) that the XIM stays at light_level for
-        before returning to the master-controlled intensity.
-        When 0, it represents a master-controlled intensity, which the XIM will
+        before returning to the main-controlled intensity.
+        When 0, it represents a main-controlled intensity, which the XIM will
         stay at until a new light control command is received.
         Re-sending this command will restart an already active override.
         The XIM's resolution is 10 second steps.
